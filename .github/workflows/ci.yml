@@ -2,43 +2,43 @@ name: CI - Tests automatisés
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   test:
     name: Tests et Lint
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [20.x, 22.x, 24.x]
 
     steps:
-    - name: Checkout du code
-      uses: actions/checkout@v4
+      - name: Checkout du code
+        uses: actions/checkout@v4
 
-    - name: Configuration Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+      - name: Configuration Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
 
-    - name: Installation des dépendances
-      run: npm ci
+      - name: Installation des dépendances
+        run: npm ci
 
-    - name: Lint du code
-      run: npm run lint
+      - name: Lint du code
+        run: npm run lint
 
-    - name: Build du projet
-      run: npm run build
+      - name: Build du projet
+        run: npm run build
 
-    - name: Vérification du type
-      run: npx tsc --noEmit
+      - name: Vérification du type
+        run: npx tsc --noEmit
 
-    - name: Audit de sécurité
-      run: npm audit --audit-level=high
+      - name: Audit de sécurité
+        run: npm audit --audit-level=high
 
   # Job séparé pour l'auto-merge (plus simple et fiable)
   auto-approve:
@@ -48,9 +48,9 @@ jobs:
     if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'
     permissions:
       pull-requests: write
-    
+
     steps:
-    - name: Approve Dependabot PR
-      uses: hmarr/auto-approve-action@v4
-      with:
-        github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Approve Dependabot PR
+        uses: hmarr/auto-approve-action@v4
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"

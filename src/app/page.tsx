@@ -1,6 +1,6 @@
 "use client";
 
-import { animate } from 'animejs';
+import { animate } from "animejs";
 import { useEffect, useRef } from "react";
 
 function AnimatedLogo({ text }: { text: string }) {
@@ -8,31 +8,37 @@ function AnimatedLogo({ text }: { text: string }) {
 
   useEffect(() => {
     if (ref.current) {
-      const letters = ref.current.querySelectorAll('.anime-letter');
+      const letters = ref.current.querySelectorAll(".anime-letter");
       if (!letters.length) return;
+
       // Masquer toutes les lettres au début
       letters.forEach((el) => {
-        (el as HTMLElement).style.opacity = '0';
+        (el as HTMLElement).style.opacity = "0";
       });
+
+      // Vérifier que la première lettre existe
+      const firstLetter = letters[0];
+      if (!firstLetter) return;
+
       // Animation de la première lettre (tombe du haut)
-      animate(letters[0], {
+      animate(firstLetter, {
         translateY: [-window.innerHeight, 0],
         opacity: [0, 1],
-        easing: 'easeOutBounce',
+        easing: "easeOutBounce",
         duration: 900,
         complete: () => {
           // Vague sur chaque lettre (y compris la première)
-          animate(letters, {
+          animate(Array.from(letters), {
             translateY: [0, -32, 0],
             opacity: [1, 1, 1],
             delay: (el, i) => i * 120,
             duration: 2000,
-            easing: 'easeInOutQuad',
+            easing: "easeInOutQuad",
             begin: () => {
               // Affiche chaque lettre juste avant sa vague
               letters.forEach((el, i) => {
                 setTimeout(() => {
-                  (el as HTMLElement).style.opacity = '1';
+                  (el as HTMLElement).style.opacity = "1";
                 }, i * 120);
               });
             },
@@ -42,12 +48,12 @@ function AnimatedLogo({ text }: { text: string }) {
                 animate(ref.current, {
                   scale: [1, 1.15],
                   duration: 600,
-                  easing: 'easeOutExpo',
+                  easing: "easeOutExpo",
                 });
               }
-            }
+            },
           });
-        }
+        },
       });
     }
   }, [text]);
