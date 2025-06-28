@@ -59,9 +59,9 @@ npm audit
 - **GitHub Actions** : Tests automatiques sur chaque PR
 - **Auto-merge** : Fusion automatique des mises à jour mineures après validation
 
-📖 Voir [DEPENDENCIES.md](./DEPENDENCIES.md) pour plus de détails.
-📖 Voir [NODE24.md](./NODE24.md) pour la configuration Node.js 24.
-📖 Voir [COMPONENTS.md](./COMPONENTS.md) pour les composants AnimeLogo.
+📖 Voir [DEPENDENCIES.md](./notes/DEPENDENCIES.md) pour plus de détails.
+📖 Voir [NODE24.md](./notes/NODE24.md) pour la configuration Node.js 24.
+📖 Voir [COMPONENTS.md](./notes/COMPONENTS.md) pour les composants AnimeLogo.
 
 ## Fichier principal à modifier
 
