@@ -1,40 +1,35 @@
 import React, { useEffect, useRef, useCallback } from "react";
 import { animate } from "animejs";
-import * as animeLib from "animejs";
 import "./AnimeLogo.css";
 
 /**
- * INTÉGRATION ANIME.JS V4 - IMPLÉMENTATION FINALE
+ * INTÉGRATION ANIME.JS V4 - VERSION SIMPLIFIÉE
  *
- * Cette implémentation utilise l'import moderne d'animejs v4 :
- * - `import { animate }` pour les animations principales
- * - Import namespace pour les fonctionnalités avancées (timeline, stagger)
+ * Cette implémentation utilise uniquement l'import moderne d'animejs v4 :
+ * - `import { animate }` pour toutes les animations
+ * - Implémentation personnalisée pour remplacer timeline et stagger
  *
  * Changements par rapport à l'ancienne API :
  * - anime.set() → animate() avec duration: 0
- * - anime.timeline() → animeUtils.createTimeline()
- * - anime.stagger() → animeUtils.stagger()
+ * - anime.timeline() → séquence d'animations avec setTimeout
+ * - anime.stagger() → calcul manuel des délais
  *
  * Compatibilité : ✅ TypeScript, ✅ Next.js 15, ✅ SSR
  */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const animeUtils = animeLib as any;
-
-// Types pour Anime.js
-interface AnimeInstance {
-  play(): AnimeInstance;
-  pause(): AnimeInstance;
-  restart(): AnimeInstance;
-  reverse(): AnimeInstance;
-  seek(time: number): AnimeInstance;
-  finished: Promise<void>;
-  animatables: Array<{ target: Element }>;
-}
-
-// Type pour la timeline - sera défini dynamiquement
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnimeTimeline = any;
+// Helper pour créer un effet stagger personnalisé
+const createStagger = (delay: number, options?: { from?: string | number }) => {
+  return (index: number, total: number) => {
+    if (options?.from === "center") {
+      const center = Math.floor(total / 2);
+      return Math.abs(index - center) * delay;
+    }
+    if (typeof options?.from === "number") {
+      return Math.abs(index - options.from) * delay;
+    }
+    return index * delay;
+  };
+};
 
 // Interface pour le composant
 interface AnimeLogoProps {
@@ -52,11 +47,15 @@ const ANIME_CONFIG = {
 
 const AnimeLogo: React.FC<AnimeLogoProps> = ({ className = "" }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const timelineRef = useRef<AnimeTimeline | null>(null);
+  const animationTimeoutRef = useRef<NodeJS.Timeout[]>([]);
 
-  // Animation principale optimisée
-  const createAnimeTimeline = useCallback(() => {
+  // Animation principale optimisée avec seulement animate()
+  const createAnimeSequence = useCallback(() => {
     if (!containerRef.current) return;
+
+    // Nettoyer les timeouts précédents
+    animationTimeoutRef.current.forEach((timeout) => clearTimeout(timeout));
+    animationTimeoutRef.current = [];
 
     // Configuration initiale des éléments avec animate
     animate(".letter-a", { translateX: 70, duration: 0 });
@@ -65,31 +64,30 @@ const AnimeLogo: React.FC<AnimeLogoProps> = ({ className = "" }) => {
     animate(".letter-e", { translateX: -70, duration: 0 });
     animate(".dot", { translateX: 630, translateY: -200, duration: 0 });
 
-    const animeTimeline = animeUtils
-      .createTimeline({
-        autoplay: true,
-        easing: ANIME_CONFIG.TIMELINE_EASING,
-        loop: true,
-      })
-      // Animation 1: Préparation ligne i
-      .add(
-        {
-          targets: ".letter-i .line",
-          duration: 0,
-          begin(anim: AnimeInstance) {
-            const target = anim.animatables[0]?.target as HTMLElement;
-            if (target?.removeAttribute) {
-              target.removeAttribute("stroke-dasharray");
-            }
-          },
-        },
-        0
-      )
-      // Animation 2: Rebond des lettres
-      .add(
-        {
-          targets: ".bounced",
-          transformOrigin: ["50% 100% 0px", "50% 100% 0px"],
+    // Séquence d'animations remplaçant la timeline
+    let currentTime = 0;
+
+    // Animation 1: Préparation ligne i (0ms)
+    const timeout1 = setTimeout(() => {
+      const lineEl = document.querySelector(".letter-i .line") as HTMLElement;
+      if (lineEl?.removeAttribute) {
+        lineEl.removeAttribute("stroke-dasharray");
+      }
+    }, currentTime);
+    animationTimeoutRef.current.push(timeout1);
+
+    // Animation 2: Rebond des lettres (1000ms)
+    currentTime = 1000;
+    const timeout2 = setTimeout(() => {
+      const bouncedElements = document.querySelectorAll(".bounced");
+      bouncedElements.forEach((el, index) => {
+        const staggerDelay = createStagger(ANIME_CONFIG.STAGGER_DELAY)(
+          index,
+          bouncedElements.length
+        );
+
+        animate(el, {
+          transformOrigin: "50% 100% 0px",
           translateY: [
             {
               value: [150, -160],
@@ -115,157 +113,203 @@ const AnimeLogo: React.FC<AnimeLogoProps> = ({ className = "" }) => {
             { value: 0.57, duration: 180, delay: 25, easing: "easeOutQuad" },
             { value: 0.5, duration: 190, delay: 15, easing: "easeOutQuad" },
           ],
-          delay: animeUtils.stagger(ANIME_CONFIG.STAGGER_DELAY),
+          delay: staggerDelay,
+        });
+      });
+    }, currentTime);
+    animationTimeoutRef.current.push(timeout2);
+
+    // Animation 3: Point qui apparaît (710ms)
+    currentTime = 1000 - 290;
+    const timeout3 = setTimeout(() => {
+      animate(".dot", {
+        opacity: { value: 1, duration: 100 },
+        translateY: 250,
+        scaleY: [4, 0.7],
+        scaleX: { value: 1.3, delay: 100, duration: 200 },
+        duration: 280,
+        easing: "cubicBezier(0.350, 0.560, 0.305, 1)",
+      });
+    }, currentTime);
+    animationTimeoutRef.current.push(timeout3);
+
+    // Animation 4: Transformation lettre M (860ms)
+    currentTime = 1000 - 140;
+    const timeout4 = setTimeout(() => {
+      animate(".letter-m .line", {
+        easing: "easeOutElastic(1, .8)",
+        duration: ANIME_CONFIG.ELASTIC_DURATION,
+        d(el: HTMLElement) {
+          return (
+            (el as HTMLElement & { dataset: { d2?: string } }).dataset.d2 || ""
+          );
         },
-        1000
-      )
-      // Animation 3: Point qui apparaît
-      .add(
-        {
-          targets: ".dot",
-          opacity: { value: 1, duration: 100 },
-          translateY: 250,
-          scaleY: [4, 0.7],
-          scaleX: { value: 1.3, delay: 100, duration: 200 },
-          duration: 280,
-          easing: "cubicBezier(0.350, 0.560, 0.305, 1)",
+        begin() {
+          const target = document.querySelector(
+            ".letter-m .line"
+          ) as HTMLElement;
+          if (target?.removeAttribute) {
+            target.removeAttribute("stroke-dasharray");
+          }
         },
-        "-=290"
-      )
-      // Animation 4: Transformation lettre M
-      .add(
-        {
-          targets: ".letter-m .line",
-          easing: "easeOutElastic(1, .8)",
-          duration: ANIME_CONFIG.ELASTIC_DURATION,
-          d(el: HTMLElement) {
-            return (
-              (el as HTMLElement & { dataset: { d2?: string } }).dataset.d2 ||
-              ""
-            );
-          },
-          begin(anim: AnimeInstance) {
-            const target = anim.animatables[0]?.target as HTMLElement;
-            if (target?.removeAttribute) {
-              target.removeAttribute("stroke-dasharray");
-            }
-          },
-        },
-        "-=140"
-      )
-      // Animation 5: Glissement des lettres
-      .add(
-        {
-          targets: [".letter-a", ".letter-n", ".letter-i", ".letter-e"],
+      });
+    }, currentTime);
+    animationTimeoutRef.current.push(timeout4);
+
+    // Animation 5: Glissement des lettres (400ms)
+    currentTime = 1000 - 600;
+    const timeout5 = setTimeout(() => {
+      const letters = document.querySelectorAll(
+        ".letter-a, .letter-n, .letter-i, .letter-e"
+      );
+      letters.forEach((el, index) => {
+        const staggerDelay = createStagger(40, { from: 2.5 })(
+          index,
+          letters.length
+        );
+
+        animate(el, {
           translateX: 0,
           easing: "easeOutElastic(1, .6)",
           duration: 800,
-          delay: animeUtils.stagger(40, { from: 2.5 }),
-          change(anim: AnimeInstance) {
-            const target = anim.animatables[2]?.target as HTMLElement;
-            if (target?.removeAttribute) {
-              target.removeAttribute("stroke-dasharray");
+          delay: staggerDelay,
+          change() {
+            if (index === 2) {
+              // letter-i
+              const target = document.querySelector(
+                ".letter-i .line"
+              ) as HTMLElement;
+              if (target?.removeAttribute) {
+                target.removeAttribute("stroke-dasharray");
+              }
             }
           },
+        });
+      });
+    }, currentTime);
+    animationTimeoutRef.current.push(timeout5);
+
+    // Animation 6: Finalisation lettre M (320ms)
+    currentTime = 1000 - 680;
+    const timeout6 = setTimeout(() => {
+      animate(".letter-m .line", {
+        d(el: HTMLElement) {
+          return (
+            (el as HTMLElement & { dataset: { d3?: string } }).dataset.d3 || ""
+          );
         },
-        "-=600"
-      )
-      // Animation 6: Finalisation lettre M
-      .add(
-        {
-          targets: ".letter-m .line",
-          d(el: HTMLElement) {
-            return (
-              (el as HTMLElement & { dataset: { d3?: string } }).dataset.d3 ||
-              ""
-            );
-          },
-          easing: "spring(.2, 200, 3, 60)",
+        easing: "spring(.2, 200, 3, 60)",
+      });
+    }, currentTime);
+    animationTimeoutRef.current.push(timeout6);
+
+    // Animation 7: Point qui rebondit (-273ms, donc immédiatement)
+    currentTime = 1000 - 1273;
+    if (currentTime < 0) currentTime = 0;
+    const timeout7 = setTimeout(() => {
+      animate(".dot", {
+        translateX: 430,
+        translateY: [
+          { value: 244, duration: 100 },
+          { value: 40, duration: 200, delay: 130 },
+          { value: 210, duration: 225, easing: "easeOutQuad", delay: 25 },
+        ],
+        rotate: { value: "1turn", duration: 790 },
+        scaleX: { value: 1, duration: 50, easing: "easeOutSine" },
+        scaleY: [
+          { value: [1, 1.5], duration: 50, easing: "easeInSine" },
+          { value: 1, duration: 50, easing: "easeOutExpo" },
+        ],
+        easing: "cubicBezier(0, .74, 1, .255)",
+        duration: 800,
+      });
+    }, currentTime);
+    animationTimeoutRef.current.push(timeout7);
+
+    // Animation 8: Stabilisation du point (526ms)
+    currentTime = 1000 - 474;
+    const timeout8 = setTimeout(() => {
+      animate(".dot", {
+        scale: 1,
+        rotate: "1turn",
+        scaleY: { value: 0.5, duration: 150, delay: 230 },
+        translateX: 430,
+        translateY: [
+          { value: 244, duration: 100 },
+          { value: 204, duration: 200, delay: 130 },
+          { value: 224, duration: 225, easing: "easeOutQuad", delay: 25 },
+        ],
+        duration: 200,
+        easing: "easeOutSine",
+      });
+    }, currentTime);
+    animationTimeoutRef.current.push(timeout8);
+
+    // Animation 9: Transformation finale lettre I (330ms)
+    currentTime = 1000 - 670;
+    const timeout9 = setTimeout(() => {
+      animate(".letter-i .line", {
+        transformOrigin: "50% 100% 0",
+        d(el: HTMLElement) {
+          return (
+            (el as HTMLElement & { dataset: { d2?: string } }).dataset.d2 || ""
+          );
         },
-        "-=680"
-      )
-      // Animation 7: Point qui rebondit
-      .add(
-        {
-          targets: ".dot",
-          translateX: 430,
-          translateY: [
-            { value: 244, duration: 100 },
-            { value: 40, duration: 200, delay: 130 },
-            { value: 210, duration: 225, easing: "easeOutQuad", delay: 25 },
-          ],
-          rotate: { value: "1turn", duration: 790 },
-          scaleX: { value: 1, duration: 50, easing: "easeOutSine" },
-          scaleY: [
-            { value: [1, 1.5], duration: 50, easing: "easeInSine" },
-            { value: 1, duration: 50, easing: "easeOutExpo" },
-          ],
-          easing: "cubicBezier(0, .74, 1, .255)",
-          duration: 800,
-        },
-        "-=1273"
-      )
-      // Animation 8: Stabilisation du point
-      .add(
-        {
-          targets: ".dot",
-          scale: 1,
-          rotate: "1turn",
-          scaleY: { value: 0.5, duration: 150, delay: 230 },
-          translateX: 430,
-          translateY: [
-            { value: 244, duration: 100 },
-            { value: 204, duration: 200, delay: 130 },
-            { value: 224, duration: 225, easing: "easeOutQuad", delay: 25 },
-          ],
-          duration: 200,
-          easing: "easeOutSine",
-        },
-        "-=474"
-      )
-      // Animation 9: Transformation finale lettre I
-      .add(
-        {
-          targets: ".letter-i .line",
-          transformOrigin: ["50% 100% 0", "50% 100% 0"],
-          d(el: HTMLElement) {
-            return (
-              (el as HTMLElement & { dataset: { d2?: string } }).dataset.d2 ||
-              ""
-            );
-          },
-          easing: "cubicBezier(0.400, 0.530, 0.070, 1)",
-          duration: 80,
-        },
-        "-=670"
-      )
-      // Animation 10: Animation des lettres
-      .add(
-        {
-          targets: ".logo-letter",
+        easing: "cubicBezier(0.400, 0.530, 0.070, 1)",
+        duration: 80,
+      });
+    }, currentTime);
+    animationTimeoutRef.current.push(timeout9);
+
+    // Animation 10: Animation des lettres (330ms)
+    const timeout10 = setTimeout(() => {
+      const logoLetters = document.querySelectorAll(".logo-letter");
+      logoLetters.forEach((el, index) => {
+        const staggerDelay = createStagger(60, { from: "center" })(
+          index,
+          logoLetters.length
+        );
+        const pathElement = el.querySelector("path") as SVGPathElement;
+
+        animate(el, {
           translateY: [
             { value: 40, duration: 150, easing: "easeOutQuart" },
             { value: 0, duration: 800, easing: "easeOutElastic(1, .5)" },
           ],
-          strokeDashoffset: [animeUtils.setDashoffset, 0],
-          delay: animeUtils.stagger(60, { from: "center" }),
-        },
-        "-=670"
-      )
-      // Animation 11: Finalisation rebonds
-      .add(
-        {
-          targets: ".bounced",
+          strokeDashoffset: [pathElement?.getTotalLength?.() || 0, 0],
+          delay: staggerDelay,
+        });
+      });
+    }, currentTime);
+    animationTimeoutRef.current.push(timeout10);
+
+    // Animation 11: Finalisation rebonds (-90ms, donc immédiatement)
+    currentTime = 1000 - 1090;
+    if (currentTime < 0) currentTime = 0;
+    const timeout11 = setTimeout(() => {
+      const bouncedElements = document.querySelectorAll(".bounced");
+      bouncedElements.forEach((el, index) => {
+        const staggerDelay = createStagger(60, { from: "center" })(
+          index,
+          bouncedElements.length
+        );
+
+        animate(el, {
           scaleY: [
             { value: 0.4, duration: 150, easing: "easeOutQuart" },
             { value: 0.5, duration: 800, easing: "easeOutElastic(1, .5)" },
           ],
-          delay: animeUtils.stagger(60, { from: "center" }),
-        },
-        "-=1090"
-      );
+          delay: staggerDelay,
+        });
+      });
+    }, currentTime);
+    animationTimeoutRef.current.push(timeout11);
 
-    timelineRef.current = animeTimeline;
+    // Redémarrer l'animation après un délai
+    const restartTimeout = setTimeout(() => {
+      createAnimeSequence();
+    }, 5000);
+    animationTimeoutRef.current.push(restartTimeout);
   }, []);
 
   // Fonction pour ajuster la taille
@@ -334,7 +378,7 @@ const AnimeLogo: React.FC<AnimeLogoProps> = ({ className = "" }) => {
           0,
           ".bounce svg"
         );
-        createAnimeTimeline();
+        createAnimeSequence();
 
         return cleanupResize;
       } catch (error) {
@@ -347,21 +391,11 @@ const AnimeLogo: React.FC<AnimeLogoProps> = ({ className = "" }) => {
 
     return () => {
       // Nettoyage
-      if (timelineRef.current) {
-        try {
-          // Utiliser any pour accéder à la méthode pause si elle existe
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const timeline = timelineRef.current as any;
-          if (timeline.pause) {
-            timeline.pause();
-          }
-        } catch (error) {
-          console.warn("Error pausing timeline:", error);
-        }
-      }
+      animationTimeoutRef.current.forEach((timeout) => clearTimeout(timeout));
+      animationTimeoutRef.current = [];
       cleanup?.();
     };
-  }, [fitElementToParent, createAnimeTimeline]);
+  }, [fitElementToParent, createAnimeSequence]);
 
   return (
     <div
