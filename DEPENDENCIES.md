@@ -2,9 +2,32 @@
 
 Ce projet utilise une gestion automatisée des mises à jour de dépendances via Dependabot et GitHub Actions.
 
+## 📦 **Dépendances Actuelles**
+
+### Dépendances de Production
+
+- **animejs**: ^4.0.2 - Library d'animations JavaScript
+- **next**: 15.3.4 - Framework React full-stack
+- **react**: ^19.1.0 - Library UI
+- **react-dom**: ^19.1.0 - Renderer DOM pour React
+
+### Dépendances de Développement
+
+- **@eslint/eslintrc**: ^3 - Configuration ESLint
+- **@tailwindcss/postcss**: ^4 - PostCSS pour Tailwind
+- **@types/node**: ^24 - Types TypeScript pour Node.js
+- **@types/react**: ^19 - Types TypeScript pour React
+- **@types/react-dom**: ^19 - Types TypeScript pour React DOM
+- **eslint**: ^9 - Linter JavaScript/TypeScript
+- **eslint-config-next**: 15.3.4 - Configuration ESLint pour Next.js
+- **postcss**: ^8 - Processeur CSS
+- **tailwindcss**: ^3 - Framework CSS utility-first
+- **typescript**: ^5 - Superset typé de JavaScript
+
 ## 🤖 Dependabot
 
 Dependabot est configuré pour :
+
 - Vérifier les mises à jour **chaque lundi à 9h00 (heure de Paris)**
 - Créer des PRs groupées pour les mises à jour mineures et patches
 - Limiter à **5 PRs ouvertes** simultanément
@@ -13,6 +36,7 @@ Dependabot est configuré pour :
 ### Configuration
 
 La configuration se trouve dans `.github/dependabot.yml` et surveille :
+
 - Les dépendances npm/yarn
 - Les GitHub Actions
 
@@ -25,13 +49,15 @@ Par défaut, les mises à jour majeures de React sont ignorées pour éviter les
 Deux workflows GitHub Actions :
 
 ### `ci.yml` - Tests et validation
+
 - Exécute les tests sur chaque PR
-- Vérifie le lint et le build  
+- Vérifie le lint et le build
 - Teste sur Node.js 18 et 20
 - Audit de sécurité automatique
 - **Auto-approve** les PRs Dependabot après validation des tests
 
-### `dependabot.yml` - Auto-merge intelligent  
+### `dependabot.yml` - Auto-merge intelligent
+
 - **Auto-merge automatique** uniquement pour les mises à jour mineures et patches
 - Les mises à jour majeures nécessitent une validation manuelle
 - Utilise l'action officielle `dependabot/fetch-metadata` pour plus de fiabilité
@@ -39,14 +65,17 @@ Deux workflows GitHub Actions :
 ## 📋 Scripts disponibles
 
 ### Vérification manuelle des mises à jour
+
 ```bash
 npm run check-updates
 ```
 
 ### Mise à jour manuelle des dépendances
+
 ```bash
 npm run update-deps
 ```
+
 ⚠️ **Attention** : Cette commande met à jour toutes les dépendances, y compris les versions majeures.
 
 ## 🛡️ Sécurité

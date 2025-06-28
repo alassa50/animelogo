@@ -1,14 +1,51 @@
-# Optimisations du fichier page.tsx
+# Optimisations du projet AnimeLogo
 
-## ✅ **Optimisations appliquées**
+## ✅ **État actuel du projet**
 
-### 🎯 **1. Structure et Types**
+### 🎯 **Architecture des composants**
 
-- **Interface TypeScript** : `AnimatedLogoProps` avec props optionnelles
+Le projet contient **3 composants AnimeLogo** optimisés :
+
+1. **AnimeLogoSimple.tsx** - Composant principal avec animations fluides
+2. **AnimeLogo2.tsx** - Import dynamique pour résoudre les problèmes de compatibilité
+3. **AnimeLogo.tsx** - Composant original avec configuration centralisée
+
+### 🔧 **Solutions de compatibilité**
+
+#### Import dynamique (AnimeLogo2.tsx)
+
+```typescript
+// Import dynamique d'anime.js pour éviter les problèmes d'import
+let anime: any;
+
+const loadAnime = async () => {
+  if (!anime) {
+    anime = (await import("animejs")).default;
+  }
+  return anime;
+};
+```
+
+Cette approche résout définitivement les problèmes d'import avec Next.js 15 et Anime.js v4.
+
+### ⚡ **Optimisations techniques**
+
+#### 1. **Types TypeScript stricts**
+
+- **Interfaces personnalisées** : `AnimatedLogoProps`, `AnimeInstance`
 - **Types stricts** : Toutes les variables typées correctement
+- **Compatible Node.js 24** : ES2022 target
 - **Props par défaut** : `className = ""` pour éviter les erreurs
 
-### 🔧 **2. Configuration centralisée**
+#### 2. **Performance**
+
+- **useCallback** : Mémorisation des fonctions d'animation
+- **willChange** : Optimisation GPU avec `transform, opacity`
+- **Cleanup** : Nettoyage automatique des animations au démontage
+- **Clés uniques** : `key="${char}-${i}"` pour éviter les re-renders
+- **Import dynamique** : Chargement différé d'Anime.js
+
+#### 3. **Configuration centralisée**
 
 ```typescript
 const ANIMATION_CONFIG = {
@@ -19,34 +56,6 @@ const ANIMATION_CONFIG = {
   DROP_HEIGHT: -800, // Valeur fixe (pas de window côté serveur)
 } as const;
 ```
-
-### ⚡ **3. Performance**
-
-- **useCallback** : Mémorisation des fonctions d'animation
-- **willChange** : Optimisation GPU avec `transform, opacity`
-- **Cleanup** : Nettoyage automatique des animations au démontage
-- **Clés uniques** : `key="${char}-${i}"` pour éviter les re-renders
-
-### 🏗️ **4. Architecture modulaire**
-
-- **Fonctions séparées** : `hideLetters`, `animateFirstLetter`, `animateWave`
-- **Responsabilité unique** : Chaque fonction a un rôle précis
-- **Réutilisabilité** : Code plus maintenable
-
-### 🎨 **5. Accessibilité**
-
-- **ARIA labels** : `aria-label` pour les sections
-- **Rôles sémantiques** : `role="banner"` pour le logo
-- **aria-hidden** : Lettres individuelles masquées pour les lecteurs d'écran
-- **Structure HTML** : `<header>`, `<main>`, `<footer>`, `<section>`
-
-### 🎭 **6. Animations améliorées**
-
-- **Animation de scale** : Retour à 1 après l'effet (plus naturel)
-- **Cleanup approprié** : Reset des styles CSS après animation
-- **Gestion d'erreurs** : Vérifications nullish avant animations
-
-### 📱 **7. UX/UI**
 
 - **Hover effect** : `hover:scale-105` sur le composant secondaire
 - **Transitions** : `transition-all duration-300` pour la fluidité

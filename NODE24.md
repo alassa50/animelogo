@@ -9,6 +9,14 @@ Ce projet est optimisé pour Node.js 24 avec les dernières fonctionnalités et 
 - **Turbopack** : Bundler stable de Next.js pour des builds ultra-rapides
 - **ES2022 Target** : Utilise les dernières fonctionnalités JavaScript
 - **Optimisation des imports** : Chargement optimisé des packages
+- **Import dynamique** : Résolution des problèmes de compatibilité
+
+### Versions actuelles
+
+- **Next.js** : 15.3.4
+- **React** : 19.1.0
+- **Anime.js** : 4.0.2
+- **TypeScript** : Compatible strict mode
 
 ### Scripts optimisés
 
@@ -24,6 +32,9 @@ npm run lint:fix
 
 # Nettoyage des caches
 npm run clean
+
+# Mise à jour des dépendances
+npm run update-deps
 ```
 
 ## 📋 Prérequis

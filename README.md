@@ -27,11 +27,14 @@ Ouvrez [http://localhost:3000](http://localhost:3000) pour voir la démo.
 
 ## Fonctionnalités
 
-- Next.js (App Router, TypeScript) avec **Turbopack**
+- Next.js 15.3.4 (App Router, TypeScript) avec **Turbopack**
+- React 19.1.0
 - Tailwind CSS
-- **Deux composants AnimeLogo** avec animations Anime.js
+- **Trois composants AnimeLogo** avec animations Anime.js v4.0.2
+- **Import dynamique** résolvant les problèmes de compatibilité
 - **Gestion automatique des dépendances** avec Dependabot
 - **Optimisé pour Node.js 24** (ES2022, performances)
+- **TypeScript strict** compatible
 
 ## 🔄 Gestion des Dépendances
 
@@ -66,6 +69,7 @@ npm audit
 
 ## Dépendances principales
 
-- [Next.js](https://nextjs.org)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Anime.js](https://animejs.com)
+- [Next.js 15.3.4](https://nextjs.org) - Framework React
+- [React 19.1.0](https://react.dev) - Library UI
+- [Tailwind CSS](https://tailwindcss.com) - Framework CSS
+- [Anime.js v4.0.2](https://animejs.com) - Library d'animations

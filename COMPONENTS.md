@@ -1,8 +1,8 @@
 # Composants AnimeLogo
 
-Ce projet contient maintenant **deux composants AnimeLogo** avec des animations différentes :
+Ce projet contient maintenant **trois composants AnimeLogo** avec des animations différentes utilisant Anime.js v4.0.2 :
 
-## 🎨 **AnimeLogoSimple** (Nouveau)
+## 🎨 **AnimeLogoSimple** (Composant Principal)
 
 **Emplacement** : `src/components/AnimeLogoSimple.tsx`
 
@@ -10,7 +10,7 @@ Ce projet contient maintenant **deux composants AnimeLogo** avec des animations 
 
 - ✅ **Compatible TypeScript strict**
 - ✅ **Optimisé pour Node.js 24**
-- ✅ **Animations fluides** avec Anime.js
+- ✅ **Animations fluides** avec Anime.js v4
 - ✅ **Responsive** (mobile-friendly)
 - ✅ **Gradient moderne** Tailwind CSS
 
@@ -28,16 +28,42 @@ Ce projet contient maintenant **deux composants AnimeLogo** avec des animations 
 - Point animé avec pulsation
 - Tailles responsive (6xl sur desktop, 8xl sur mobile)
 
-## 🎯 **AnimatedLogo** (Existant)
+## 🎯 **AnimeLogo2** (Import Dynamique)
 
-**Emplacement** : `src/app/page.tsx` (fonction inline)
+**Emplacement** : `src/components/AnimeLogo2.tsx`
+
+### Fonctionnalités
+
+- **Import dynamique** : Résout les problèmes de compatibilité Anime.js + Next.js
+- **Architecture asynchrone** : Chargement différé d'Anime.js
+- **Timeline complexe** : Animations séquentielles sophistiquées
+- **Types personnalisés** : Interfaces TypeScript dédiées
+
+### Technique
+
+```typescript
+// Import dynamique d'anime.js
+let anime: any;
+
+const loadAnime = async () => {
+  if (!anime) {
+    anime = (await import("animejs")).default;
+  }
+  return anime;
+};
+```
+
+## 🔧 **AnimeLogo** (Composant Original)
+
+**Emplacement** : `src/components/AnimeLogo.tsx`
 
 ### Fonctionnalités
 
 - Animation lettre par lettre
-- Effet de vague
+- Effet de vague avec délais
 - Masquage/affichage progressif
 - Effet de scale final
+- Configuration centralisée
 
 ## 📱 **Usage dans l'application**
 
@@ -46,8 +72,15 @@ Ce projet contient maintenant **deux composants AnimeLogo** avec des animations 
 export default function Home() {
   return (
     <main>
-      <AnimeLogoSimple /> {/* Nouveau composant */}
-      <AnimatedLogo text="Anime Logo 2" /> {/* Composant existant */}
+      <AnimeLogoSimple />     {/* Composant principal */}
+      <AnimeLogo2 />          {/* Import dynamique */}
+      <AnimeLogo              {/* Composant original */}
+        text="Anime Logo 2"
+        className="hover:scale-105 transition-transform duration-300 transform"
+      />
+    </main>
+  );
+}
     </main>
   );
 }
