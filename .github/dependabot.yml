@@ -1,0 +1,56 @@
+# Configuration Dependabot pour la mise à jour automatique des dépendances
+version: 2
+updates:
+  # Mises à jour des dépendances npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Paris"
+    # Limite le nombre de PRs ouvertes en même temps
+    open-pull-requests-limit: 5
+    # Grouper les mises à jour mineures et patches
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Configuration des commits
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    # Reviewer automatique (optionnel, remplacez par votre nom d'utilisateur GitHub)
+    reviewers:
+      - "Alexandre"
+    # Assignee automatique (optionnel)
+    assignees:
+      - "Alexandre"
+    # Labels à ajouter aux PRs
+    labels:
+      - "dependencies"
+      - "javascript"
+    # Ignorer certaines dépendances si nécessaire
+    ignore:
+      # Exemple: ignorer les mises à jour majeures de React
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+
+  # Mises à jour des GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Paris"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "github-actions"
+      - "ci"

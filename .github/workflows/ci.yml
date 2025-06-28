@@ -1,0 +1,63 @@
+name: CI - Tests automatisés
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+    # Déclencher spécifiquement pour les PRs Dependabot
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test:
+    name: Tests et Lint
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - name: Checkout du code
+      uses: actions/checkout@v4
+
+    - name: Configuration Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Installation des dépendances
+      run: npm ci
+
+    - name: Lint du code
+      run: npm run lint
+
+    - name: Build du projet
+      run: npm run build
+
+    - name: Vérification du type
+      run: npx tsc --noEmit
+
+  auto-merge-dependabot:
+    name: Auto-merge Dependabot PRs
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    
+    steps:
+    - name: Approbation automatique
+      uses: hmarr/auto-approve-action@v3
+      with:
+        github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+    - name: Auto-merge pour les mises à jour mineures/patch
+      uses: pascalgn/merge-action@v0.15.6
+      with:
+        github_token: "${{ secrets.GITHUB_TOKEN }}"
+        merge_method: "squash"
+        merge_commit_message: "pull-request-title-and-description"
+      env:
+        MERGE_LABELS: "dependencies,!breaking-change"
+        MERGE_REMOVE_LABELS: "dependencies"
+        MERGE_METHOD: "squash"
