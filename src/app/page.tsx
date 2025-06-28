@@ -4,7 +4,6 @@ import AnimeLogoSimple from "../components/AnimeLogoSimple";
 import AnimeLogo2 from "../components/AnimeLogo2";
 import AnimeLogo from "../components/AnimeLogo";
 
-// Composant Home optimisé avec une meilleure structure sémantique
 export default function Home() {
   return (
     <div className="grid grid-rows-[20px_1fr_20px] p-8 sm:p-20 pb-20 min-h-screen font-[family-name:var(--font-geist-sans)]">
