@@ -29,7 +29,7 @@ Ouvrez [http://localhost:3000](http://localhost:3000) pour voir la démo.
 
 - Next.js (App Router, TypeScript) avec **Turbopack**
 - Tailwind CSS
-- Animation du texte "Anime Logo" avec Anime.js
+- **Deux composants AnimeLogo** avec animations Anime.js
 - **Gestion automatique des dépendances** avec Dependabot
 - **Optimisé pour Node.js 24** (ES2022, performances)
 
@@ -58,6 +58,7 @@ npm audit
 
 📖 Voir [DEPENDENCIES.md](./DEPENDENCIES.md) pour plus de détails.
 📖 Voir [NODE24.md](./NODE24.md) pour la configuration Node.js 24.
+📖 Voir [COMPONENTS.md](./COMPONENTS.md) pour les composants AnimeLogo.
 
 ## Fichier principal à modifier
 

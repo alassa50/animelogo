@@ -1,0 +1,135 @@
+/* Styles pour AnimeLogo */
+.main-logo {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.logo-animation {
+  width: 100%;
+  height: 300px;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-animation__wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.anime-logo {
+  width: 100%;
+  height: 100%;
+}
+
+.anime-logo__signs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 10px;
+}
+
+.logo-letter {
+  position: relative;
+}
+
+.logo-letter svg {
+  max-height: 200px;
+  width: auto;
+}
+
+.logo-letter .line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+}
+
+.bounced {
+  transform-origin: 50% 100%;
+}
+
+.bounce {
+  position: relative;
+}
+
+.bounce svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+}
+
+.dot {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  opacity: 0;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+}
+
+/* Couleurs pour chaque lettre */
+.letter-a .line {
+  color: #ff6b6b;
+}
+
+.letter-n .line {
+  color: #feca57;
+}
+
+.letter-i .line {
+  color: #48dbfb;
+}
+
+.letter-m .line {
+  color: #ff9ff3;
+}
+
+.letter-e .line {
+  color: #54a0ff;
+}
+
+/* Animation responsive */
+@media (max-width: 768px) {
+  .logo-animation {
+    height: 200px;
+  }
+
+  .logo-letter svg {
+    max-height: 150px;
+  }
+
+  .logo-letter .line {
+    stroke-width: 8;
+  }
+
+  .anime-logo__signs {
+    gap: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-animation {
+    height: 150px;
+  }
+
+  .logo-letter svg {
+    max-height: 100px;
+  }
+
+  .logo-letter .line {
+    stroke-width: 6;
+  }
+
+  .anime-logo__signs {
+    gap: 2px;
+  }
+}
