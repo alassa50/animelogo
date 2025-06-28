@@ -22,10 +22,19 @@ Par défaut, les mises à jour majeures de React sont ignorées pour éviter les
 
 ## 🔄 Workflow CI/CD
 
-Un workflow GitHub Actions (`.github/workflows/ci.yml`) :
+Deux workflows GitHub Actions :
+
+### `ci.yml` - Tests et validation
 - Exécute les tests sur chaque PR
-- Vérifie le lint et le build
-- **Auto-merge** les PRs Dependabot pour les mises à jour mineures/patches après validation des tests
+- Vérifie le lint et le build  
+- Teste sur Node.js 18 et 20
+- Audit de sécurité automatique
+- **Auto-approve** les PRs Dependabot après validation des tests
+
+### `dependabot.yml` - Auto-merge intelligent  
+- **Auto-merge automatique** uniquement pour les mises à jour mineures et patches
+- Les mises à jour majeures nécessitent une validation manuelle
+- Utilise l'action officielle `dependabot/fetch-metadata` pour plus de fiabilité
 
 ## 📋 Scripts disponibles
 

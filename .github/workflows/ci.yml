@@ -5,8 +5,6 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
-    # Déclencher spécifiquement pour les PRs Dependabot
-    types: [opened, synchronize, reopened]
 
 jobs:
   test:
@@ -39,25 +37,20 @@ jobs:
     - name: Vérification du type
       run: npx tsc --noEmit
 
-  auto-merge-dependabot:
-    name: Auto-merge Dependabot PRs
-    needs: test
+    - name: Audit de sécurité
+      run: npm audit --audit-level=high
+
+  # Job séparé pour l'auto-merge (plus simple et fiable)
+  auto-approve:
+    name: Auto-approve Dependabot
     runs-on: ubuntu-latest
-    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    needs: test
+    if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
     
     steps:
-    - name: Approbation automatique
-      uses: hmarr/auto-approve-action@v3
+    - name: Approve Dependabot PR
+      uses: hmarr/auto-approve-action@v4
       with:
         github-token: "${{ secrets.GITHUB_TOKEN }}"
-
-    - name: Auto-merge pour les mises à jour mineures/patch
-      uses: pascalgn/merge-action@v0.15.6
-      with:
-        github_token: "${{ secrets.GITHUB_TOKEN }}"
-        merge_method: "squash"
-        merge_commit_message: "pull-request-title-and-description"
-      env:
-        MERGE_LABELS: "dependencies,!breaking-change"
-        MERGE_REMOVE_LABELS: "dependencies"
-        MERGE_METHOD: "squash"
