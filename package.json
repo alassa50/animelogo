@@ -18,8 +18,8 @@
     "clean": "rimraf .next out node_modules/.cache"
   },
   "dependencies": {
-    "animejs": "^4.0.2",
-    "next": "15.3.5",
+    "animejs": "^4.1.2",
+    "next": "15.4.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
@@ -30,7 +30,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.3.5",
+    "eslint-config-next": "15.4.4",
     "rimraf": "^6",
     "tailwindcss": "^4",
     "typescript": "^5"
